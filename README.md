@@ -1,2 +1,2 @@
 # mxy-ai-note
-ai学习笔记
+ai学习笔记  
