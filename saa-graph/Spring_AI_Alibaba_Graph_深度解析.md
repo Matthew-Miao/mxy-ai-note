@@ -59,7 +59,7 @@
 9. [生态集成与扩展](#9-生态集成与扩展)
 10. [总结与展望](#10-总结与展望)
 
----
+--- 
 
 ## 1. 引言概述
 
@@ -2162,12 +2162,8 @@ Spring AI Alibaba Graph 代表了 AI 应用开发的一个重要方向。它不�
 4. [响应式编程指南](https://projectreactor.io/docs)
 5. [Spring Boot 官方文档](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
 
-**作者信息**
+**备注**
 
 本文档基于 Spring AI Alibaba Graph 源码分析和实践经验编写，旨在为开发者提供全面、深入的技术指南。如有疑问或建议，欢迎交流讨论。
 
 ---
-
-*文档版本：v1.0*  
-*最后更新：2024年12月*  
-*字数统计：约15,000字*
