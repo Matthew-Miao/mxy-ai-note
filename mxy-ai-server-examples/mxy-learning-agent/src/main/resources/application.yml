@@ -1,121 +1,65 @@
+
 server:
-  port: 8080
+  port: 9000
 
 spring:
-  application:
-    name: mxy-learning-agent
-  
-  # 数据库配置
+#  # 主数据源 - PostgreSQL (向量数据，供 Spring AI 使用)
   datasource:
-    url: jdbc:mysql://localhost:3306/learning_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
-    
-# MyBatis Plus配置
+#    pgvector:
+#      url: jdbc:postgresql://${postgresql.host}:5432/mxy_rag_vector_db
+#      username: postgres
+#      password: postgres
+#      driver-class-name: org.postgresql.Driver
+#      hikari:
+#        pool-name: VectorDBHikariCP
+#        minimum-idle: 10
+#        maximum-pool-size: 12
+#        connection-timeout: 60000
+#        idle-timeout: 500000
+#        max-lifetime: 540000
+    # 次要数据源 - MySQL (业务数据)
+    mysql:
+      url: jdbc:mysql://${mysql.host}:3306/mxy_rag_db?useUnicode=true&characterEncoding=utf-8&autocommit=false&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&useSSL=false&serverTimezone=Asia/Shanghai
+      username: ${mysql.username}
+      password: ${mysql.password}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: BusinessDBHikariCP
+        minimum-idle: 10
+        maximum-pool-size: 12
+        connection-timeout: 60000
+        idle-timeout: 500000
+        max-lifetime: 540000
+        connection-test-query: SELECT 1
+        auto-commit: true
+        leak-detection-threshold: 5000
+
+  application:
+    name: mxy-rag-server
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-plus-latest
+
+# MyBatis Plus 配置 (用于 MySQL 业务数据)
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: auto
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
   mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.mxy.platform.ai.learning.agent.infrastructure.dao.po
 
-# SpringAI配置
-spring:
-  ai:
-    dashscope:
-      api-key: ${DASHSCOPE_API_KEY:your-api-key-here}
-      chat:
-        options:
-          model: qwen-max
-          temperature: 0.7
-          max-tokens: 1000
 
-# 学习助手配置
-learning:
-  agent:
-    # 基础配置
-    default-difficulty: 3
-    max-questions-per-topic: 5
-    passing-score: 0.7
-    session-timeout: 30m
-    
-    # Graph工作流配置
-    graph:
-      enabled: true
-      checkpoint:
-        enabled: true
-        storage-type: database
-      
-    # 预设主题
-    topics:
-      - name: "Spring Boot基础"
-        description: "Spring Boot框架基础知识学习"
-        difficulty-levels: 5
-      - name: "Java集合框架"
-        description: "Java集合框架的使用和原理"
-        difficulty-levels: 5
-      - name: "数据库设计"
-        description: "关系型数据库设计原理和实践"
-        difficulty-levels: 5
-      - name: "算法与数据结构"
-        description: "基础算法和数据结构学习"
-        difficulty-levels: 5
-      - name: "设计模式"
-        description: "常用设计模式的理解和应用"
-        difficulty-levels: 5
-
-# 日志配置
-logging:
-  level:
-    com.mxy.platform.ai.learning.agent: DEBUG
-    org.springframework.ai: DEBUG
-    com.alibaba.cloud.ai: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
-  file:
-    name: logs/learning-agent.log
-    max-size: 100MB
-    max-history: 30
-
-# Swagger配置
-springdoc:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-  info:
-    title: "渐进式学习助手API"
-    description: "基于SpringAI Alibaba Graph的智能学习系统"
-    version: "1.0.0"
-    contact:
-      name: "MXY Team"
-      email: "support@mxy.com"
-
-# 管理端点配置
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: when-authorized
-  info:
-    env:
-      enabled: true
-    java:
-      enabled: true
-    os:
-      enabled: true
+swagger:
+  title: MXY-RAG API接口文档
+  description: MXY-RAG API接口文档
+  authorName: MXY
+  licenseName: MXY
+  basePackage: com.mxy.ai.rag.web.controller
